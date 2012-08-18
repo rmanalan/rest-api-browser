@@ -1,0 +1,189 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Bitbucket REST API Browser</title>
+    <link rel="stylesheet" href="https://dwz7u9t8u8usb.cloudfront.net/m/f2f691bde1d0/bun/niptuck/css/4b48f95786d7.css" type="text/css">
+    <link rel="stylesheet" href="css/prettify.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" src="js/underscore-min.js"></script>
+    <script type="text/javascript" src="js/backbone-min.js"></script>
+    <script type="text/javascript" src="js/html4-defs.js"></script>
+    <script type="text/javascript" src="js/html-sanitizer.js"></script>
+    <script type="text/javascript" src="js/prettify.js"></script>
+    <script type="text/javascript" src="js/process-wadl.js"></script>
+    <script type="text/javascript" src="js/app.js">
+  </head>
+  <body class="aui-layout">    
+    <script type="text/x-tmpl" id="rab-menu-item">
+      <li class="menu-item" data-id="{{= pluginCompleteKey}}" title="{{= pluginName}}">
+        <a data-id="{{= pluginCompleteKey}}" href="#/{{= pluginCompleteKey}}">
+          {{= pluginName}}
+          <div class="rab-meta">{{= pluginKey}}</div>
+          <div class="rab-meta">{{= path}}</div>
+        </a>
+      </li>
+    </script>
+    <script type="text/x-tmpl" id="rab-resource-body">
+      <div class="content-body">
+        <div class="rab-sidebar rab-col">
+          <h3>Resources</h3>
+          <ul class="rab-resources-sb">
+            {{each resources}}
+            <li class="rab-resource-sb">
+              <a id="rab-nav-{{= rest.slugify(name)}}" href="#rab-resource-{{= rest.slugify(name)}}" title="{{= name}}">
+              {{= name}}
+              </a>
+            </li>
+            {{/each}}
+          </ul>
+        </div>
+        <div class="rab-content rab-col">
+          <ul class="rab-resources">
+            {{each resources}}
+            <li id="rab-resource-{{= rest.slugify(name)}}" data-id="{{= rest.slugify(name)}}" class="rab-resource">
+            <h3><a href="#{{= name}}">{{= name}}</a></h3>
+            {{if description}}
+            <p>{{html html.sanitize(description)}}</p>
+            {{/if}}
+            <ul class="rab-methods">
+              {{each methods}}
+              <li class="rab-method rab-method-{{= method}}">
+              <div class="rab-title">
+                <span class="rab-http-method">{{= method}}</span>
+                <span class="rab-uri">{{= uri}}</span>
+              </div>
+              <form class="rab-endpoint" action="{{= rest.currService.model.get('path')}}{{= uri}}" method="{{= method}}">
+                <p class="rab-description">{{html html.sanitize(description)}}</p>
+                <table class="aui">
+                  <thead>
+                    <tr>
+                      <th class="rab-th-param">Parameter</th>
+                      <th class="rab-th-value">Value</th>
+                      <th class="rab-th-type">Type</th>
+                      <th class="rab-th-description">Description</th>
+                      <th class="rab-th-action"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{each params}}
+                    <tr>
+                      <td class="rab-th-param">{{= name}}</td>
+                      <td class="rab-th-value">
+                        {{if type==="boolean"}}
+                        <select name="{{= name}}" class="rab-param-style-{{= style}}">
+                          <option value="false" selected>false</option>
+                          <option value="true">true</option>
+                        </select>
+                        {{else}}
+                        <input type="text" class="rab-param-style-{{= style}}" name="{{= name}}"/>
+                        {{/if}}
+                      </td>
+                      <td class="rab-th-type">{{= type}}</td>
+                      <td class="rab-th-description">{{= html.sanitize(description)}}</td>
+                      <td class="rab-th-action"></td>
+                    </tr>
+                    {{/each}}
+                    <tr>
+                      <td colspan=5 class="rab-param-actions">
+                        <a href="#" class="rab-add-custom-param">Add custom parameter</a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                {{if method === "POST" || method === "PUT"}}
+                <textarea name="body"></textarea>
+                {{/if}}
+                <input type="submit" class="aui-button rab-exec" value="Execute"/>
+                <a href="#" class="rab-clear">Clear results</a>
+                <img class="hidden rab-throbber" src="images/ajax-loader.gif" />
+                {{if typeof representations !== 'undefined' && representations.contentTypes.length > 0}}
+                <div class="rab-output-type">
+                  <label for="representation">Representation:</label>
+                  <select name="representation">
+                    {{each representations.contentTypes}}
+                    <option value="{{= $value}}" {{if /application\/json/.test($value)}}selected{{/if}}>{{= $value}}</option>
+                    {{/each}}
+                  </select>
+                </div>
+                {{/if}}
+              </form>
+              <div class="rab-out"></div>
+              </li>
+              {{/each}}
+            </ul>
+            </li>
+            {{/each}}
+          </ul>
+        </div>
+      </div>
+    </script>
+    <script type="text/x-tmpl" id="rab-custom-param-tmpl">
+      <tr class="rab-custom-params">
+        <td class="rab-th-param">
+          <input type="text" class="rab-param-style-custom-name" />
+        </td>
+        <td class="rab-th-value">
+          <input type="text" class="rab-param-style-custom-value" />
+        </td>
+        <td class="rab-th-type">
+        </td>
+        <td class="rab-th-description">
+        </td>
+        <td class="rab-th-action">
+          <a href="#" class="rab-delete-custom-param">Delete</a>
+        </td>
+      </tr>
+    </script>
+    <script type="text/x-tmpl" id="rab-header-tmpl">
+      <div class="rab-100 cf">
+        <h1>
+          <a class="rab-name" href="#/{{= pluginCompleteKey}}">
+            {{= pluginName}}
+            <button class="rab-dd-button"></button>
+          </a>
+        </h1>
+      </div>
+      <p class="rab-descr">{{= pluginDescription}}</p>
+      <div class="rab-meta">
+        <strong>Key: </strong>{{= pluginKey}} 
+        <strong>Path: </strong><a class="rab-meta" target="_blank" href="{{= path}}">{{= path}}</a>
+        <strong>WADL: </strong><a class="rab-meta" target="_blank" href="{{= wadl}}">{{= wadl}}</a>
+      </div>
+    </script>
+    <script type="text/x-tmpl" id="rab-output-tmpl">
+      <h5>Request</h5>
+      <pre class="rab-call-out rab-out prettyprint">{{= call}}</pre>
+      <h5>Response Headers</h5>
+      <pre class="rab-rsp-head-out rab-out prettyprint">{{= headers}}</pre>
+      <h5>Response Body</h5>
+      <div>
+      <pre class="rab-rsp-body-out rab-out prettyprint">{{= body}}</pre>
+      </div>
+    </script>
+
+    <div id="page">
+      <div id="wrapper">
+
+
+        <header>BB header goes here</header>
+
+
+        <div id="content" role="main">
+          <header class="rab-service-selector hidden">
+            <section class="rab-curr-service">
+              <div class="rab-curr-head">
+              </div>
+              <ul class="rab-services-dd"></ul>
+            </section>
+          </header>
+          <div id="rab"></div>
+        </div>
+
+        <footer>BB footer goes here</footer>
+
+      </div>
+    </div>
+  </body>
+</html>

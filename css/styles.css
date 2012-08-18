@@ -1,0 +1,343 @@
+/* For modern browsers */
+.cf:before,
+.cf:after {
+  content: "";
+  display: table;
+}
+
+.cf:after {
+  clear: both;
+}
+
+/* For IE 6/7 (trigger hasLayout) */
+.cf {
+  zoom: 1;
+}
+
+.hidden {
+  display: none;
+}
+
+.rab-col {
+  float: left;
+}
+
+body {
+  background-color:#fff !important;
+}
+.rab-curr-head h1 {
+  margin: 0;
+}
+
+.rab-meta,
+.rab-meta:visited
+.rab-meta:active {
+  color: #999 !important;
+  font-size: 11px;
+}
+
+.rab-service-selector {
+  margin:0;
+  padding:5px 10px 10px 10px !important;
+  background-color:#fff;
+}
+.rab-service-selector h1 {
+  font-size: 1.8em;
+}
+.rab-name {
+  padding: 3px;
+  display: inline-block;
+  margin-left: -4px;
+}
+
+.rab-name:hover {
+  text-decoration: none;
+  background-color: #3c78b5;
+  color: #fff !important;
+}
+
+.rab-sidebar {
+  padding: 0;
+  margin: 0;
+  width: 20%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color:#fff;
+}
+
+.rab-sidebar h3 {
+  font-size:1.2em;
+  color:#333;
+  margin: 0;
+  padding: 0 10px 2px 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.rab-resource-sb {
+  padding: 0;
+  margin: 0;
+}
+
+.rab-resource-sb a {
+  border-bottom: 1px solid #eee;
+  padding: 10px !important;
+  display: block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.rab-resource-sb-active {
+  background-color: #3c78b5;
+  text-decoration: none;
+  color: #fff !important;
+}
+
+.rab-content {
+  padding: 0;
+  margin: 0;
+  width: 80%;
+  background-color:#fff;
+}
+
+.rab-100 {
+  width: 100%;
+}
+
+.rab-curr-service {
+  position: relative;
+}
+
+.rab-curr-service .rab-descr {
+  margin: 0 0 3px 0;
+}
+
+.rab-dd-button {
+  color: #999;
+  font-size: 11px;
+  margin: 0;
+  border: 0;
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  background: transparent url(../images/menu_indicator_for_light_backgrounds.gif) no-repeat;
+}
+
+.rab-name:hover .rab-dd-button {
+  background: transparent url(../images/menu_indicator_for_dark_backgrounds.gif) no-repeat !important;
+}
+
+.rab-services-dd {
+  position: absolute;
+  top: 31px;
+  opacity: 0;
+  visibility: hidden;
+  background: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, .5);
+  padding: 0;
+  margin: 0;
+  z-index: 100;
+}
+
+.rab-open {
+  opacity: 1;
+  visibility: visible;
+  -webkit-transition: opacity .3s ease;
+  -moz-transition: opacity .3s ease;
+}
+
+.rab-services-dd li a,
+.rab-services-dd li a:hover {
+  text-decoration: none;
+  color: #333;
+  padding: 5px 10px;
+  display: block;
+}
+
+.rab-services-dd li {
+  list-style-type: none;
+  cursor: default;
+  padding: 0;
+  margin: 0;
+  line-height: 120%;
+}
+
+.rab-services-dd li:hover {
+  background-color: #3c78b5;
+}
+
+.rab-services-dd li:hover a,
+.rab-services-dd li:hover .rab-meta {
+  color: #fff !important;
+}
+
+.rab-th-param {
+  width: 15%;
+}
+
+.rab-th-value {
+  width: 20%;
+}
+
+.rab-th-type {
+  width: 15%;
+}
+
+.rab-th-description {
+  width: 50%;
+}
+
+#rab ul,
+#rab li {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+#rab .rab-method ul, #rab .rab-method li {
+    list-style-type: disc !important;
+    margin: 20px 15px !important;
+}
+#rab .rab-method li {
+    margin:0 15px !important;
+}
+.rab-resource {
+  margin-bottom: 30px !important;
+  padding: 0 5px 0 10px !important;
+}
+
+.rab-resource>p {
+  padding:0;
+  margin:0 0 15px 0;
+}
+
+.rab-resource h3 {
+  font-size: 1.3em;
+  padding: 0 0 5px 0;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #ccc;
+}
+
+.rab-method {
+  margin: 0 0 5px 0 !important;
+  padding: 10px !important;
+  background-color: #eee;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.rab-title {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.rab-http-method {
+  font-weight: bold;
+  display: inline;
+  padding: 5px 7px;
+  border-radius: 5px;
+}
+
+.rab-method-GET .rab-http-method {
+  background-color: #3f7f00;
+  color: #fff;
+}
+
+.rab-method-POST .rab-http-method {
+  background-color: #005fbf;
+  color: #fff;
+}
+
+.rab-method-PUT .rab-http-method {
+  background-color: #5f00bf;
+  color: #fff;
+}
+
+.rab-method-DELETE .rab-http-method {
+  background-color: #bf0000;
+  color: #fff;
+}
+
+.rab-uri {
+  color: #666;
+}
+
+#rab pre {
+  overflow: auto;
+}
+#rab table.aui{
+    margin-bottom:10px;
+}
+#rab table.aui,
+#rab table.aui > tbody > tr {
+  background-color: rgba(255, 255, 255, .5);
+}
+
+#rab table.aui input[type=text] {
+  width: 100%;
+  padding: 2px;
+  border: 1px solid #ccc;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+
+#rab table td {
+  vertical-align: baseline;
+}
+
+.rab-endpoint {
+  margin-bottom: 10px;
+}
+
+.rab-endpoint textarea {
+  border:1px solid #e2e2e2;
+  margin:0 0 10px 0;
+  width: 100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+}
+
+pre.rab-out {
+  font-family: Consolas, Menlo, Monaco, "Lucida Console", monospace;
+  font-size: 13px;
+  padding: 10px;
+  margin: 0 0 10px 0;
+  border: 0;
+  display: block;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+div.rab-out {
+  margin-top: 15px;
+}
+
+.rab-out h5 {
+  margin: 0;
+  padding: 2px 0;
+  font-size: 12px;
+}
+
+.rab-output-type {
+  margin-top: 5px;
+  float: right;
+}
+
+td.rab-param-actions {
+  text-align: right !important;
+}
+
+#rab dt {
+    font-weight: bold;
+    margin-top:5px;
+}
+#rab dd {
+    margin:0 20px !important;
+}
+footer {
+  clear:left;
+}

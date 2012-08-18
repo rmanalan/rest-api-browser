@@ -1,0 +1,138 @@
+<!doctype html>
+<html ng-app="rab">
+  <head>
+    <title>REST API Browser</title>
+    <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" type="text/css">
+    <link rel="stylesheet" href="css/prettify.css">
+    <link rel="stylesheet" href="css/styles.css">    
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/process-wadl.js"></script>
+    <script type="text/javascript" src="js/angular-1.0.1/angular-1.0.1.js"></script>
+    <script type="text/javascript" src="js/angular-1.0.1/angular-sanitize-1.0.1.min.js"></script>
+    <script type="text/javascript" src="js/rab.js"></script>
+  </head>
+  <body>
+
+    <div id="page">
+      <div id="wrapper">
+        <div id="content" role="main">
+
+          <header class="rab-service-selector" ng-controller="ServiceSelectorController">
+            <section class="rab-curr-service">
+              <div class="rab-curr-head">
+                <div class="rab-100 cf">
+                  <h1>
+                    <a class="rab-name" href="#/{{currentService.pluginCompleteKey}}">
+                      {{currentService.pluginName}}
+                      <button class="rab-dd-button"></button>
+                    </a>
+                  </h1>
+                </div>
+                <p class="rab-descr" ng-bind-html="currentService.pluginDescription"></p>
+                <div class="rab-meta">
+                  <strong>Key: </strong>{{currentService.pluginCompleteKey}} 
+                  <strong>Path: </strong><a class="rab-meta" target="_blank" href="{{path}}">{{currentService.path}}</a>
+                  <strong>WADL: </strong><a class="rab-meta" target="_blank" href="{{wadl}}">{{currentService.wadl}}</a>
+                </div>
+
+              </div>
+              <ul class="rab-services-dd">
+                <li class="menu-item" data-id="{{pluginCompleteKey}}" title="{{pluginName}}" ng-repeat="service in services">
+                  <a data-id="{{service.pluginCompleteKey}}" href="#/{{service.pluginCompleteKey}}">
+                    {{service.pluginName}}
+                    <div class="rab-meta">{{service.pluginCompleteKey}}</div>
+                    <div class="rab-meta">{{service.path}}</div>
+                  </a>
+                </li>
+              </ul>
+            </section>
+          </header>
+          
+          <div id="rab">
+            
+            <div class="content-body" ng-controller="ResourceSidebarController">
+              <div class="rab-sidebar rab-col" rab-scrollfix>
+                <h3>Resources</h3>
+                <ul class="rab-resources-sb">
+                  <li class="rab-resource-sb" ng-repeat="resource in resources">
+                    <a id="rab-nav-{{slugify(resource.name)}}" href="#rab-resource-{{slugify(resource.name)}}" title="{{resource.name}}">
+                    {{resource.name}}
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <div class="rab-content rab-col" ng-controller="ResourceMainController">
+                <ul class="rab-resources">
+                  <li ng-repeat="resource in $parent.resources" id="rab-resource-{{slugify(resource.name)}}" class="rab-resource">
+                    <h3><a href="#{{resource.name}}" data-id="{{slugify(resource.name)}}">{{resource.name}}</a></h3>
+                    <p ng-show="resource.description" ng-bind-html="resource.description"></p>
+                    <ul class="rab-methods">
+                      <li class="rab-method rab-method-{{method.method}}" ng-repeat="method in resource.methods">
+                      <div class="rab-title">
+                        <span class="rab-http-method">{{method.method}}</span>
+                        <span class="rab-uri">{{method.uri}}</span>
+                      </div>
+                      <form class="rab-endpoint" action="{{fullUrl(method.uri)}}" method="{{method.method}}">
+                        <p class="rab-description" ng-bind-html="method.description"></p>
+                        <table class="aui">
+                          <thead>
+                            <tr>
+                              <th class="rab-th-param">Parameter</th>
+                              <th class="rab-th-value">Value</th>
+                              <th class="rab-th-type">Type</th>
+                              <th class="rab-th-description">Description</th>
+                              <th class="rab-th-action"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat="param in method.params">
+                              <td class="rab-th-param">{{param.name}}</td>
+                              <td class="rab-th-value">
+                                <!-- {{if type==="boolean"}} -->
+                                <select name="{{param.name}}" class="rab-param-style-{{param.style}}" ng-show="param.type=='boolean'">
+                                  <option value="false" selected>false</option>
+                                  <option value="true">true</option>
+                                </select>
+                                <!-- {{else}} -->
+                                <input type="text" class="rab-param-style-{{param.style}}" name="{{param.name}}" ng-show="param.type!='boolean'"/>
+                                <!-- {{/if}} -->
+                              </td>
+                              <td class="rab-th-type">{{param.type}}</td>
+                              <td class="rab-th-description" ng-bind-html="param.description"></td>
+                              <td class="rab-th-action"></td>
+                            </tr>
+                            <tr>
+                              <td colspan=5 class="rab-param-actions">
+                                <a href="#" class="rab-add-custom-param">Add custom parameter</a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <textarea name="body" ng-show="method.method=='POST' || method.method=='PUT'"></textarea>
+                        <input type="submit" class="aui-button rab-exec" value="Execute"/>
+                        <a href="#" class="rab-clear">Clear results</a>
+                        <img class="hidden rab-throbber" src="images/ajax-loader.gif" />
+                        <div class="rab-output-type" ng-show="method.representations && method.representations.contentTypes.length > 0">
+                          <label for="representation">Representation:</label>
+                          <select name="representation">
+                            <!-- {{if /application\/json/.test($value)}}selected{{/if}} -->
+                            <option value="{{contentType}}" ng-repeat="contentType in method.representations.contentTypes">{{contentType}}</option>
+                          </select>
+                        </div>
+                      </form>
+                      <div class="rab-out"></div>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </body>
+</html>
