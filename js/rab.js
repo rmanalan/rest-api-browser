@@ -26,7 +26,8 @@ angular.module('rab.directives', []).directive('rabScrollfix', [
             origSidebarTop: $(".rab-sidebar").scrollTop(),
             origSidebarOffsetTop: $(".rab-sidebar").offset().top,
             origSidebarWidth: $(".rab-sidebar").width(),
-            winHeight: $(window).height()
+            winHeight: $(window).height(),
+            loaded: false
           };
         };
         calculateBoxes();
@@ -39,31 +40,50 @@ angular.module('rab.directives', []).directive('rabScrollfix', [
           if (anchor) {
             return anchor.scrollIntoView();
           }
-        }, 100);
+        }, 300);
         angular.element($window).on('resize', function() {
           return calculateBoxes();
         });
         return angular.element($window).on('scroll.rab-scrollfix', function() {
-          var contentBottom, currPosn, elFromPoint, top, x;
+          var contentBottom, currPosn, elFromPoint, moveDownBy, moveUpBy, navItem, rabSidebar, rabSidebarInner, top, x;
           x = $(".rab-resources").position().left;
           top = $(window).scrollTop() - 15;
           elFromPoint = $(document.elementFromPoint(x, 5));
+          rabSidebar = $('.rab-sidebar');
+          rabSidebarInner = $('.rab-sidebar-inner');
           if (elFromPoint.hasClass("rab-resource")) {
             $(".rab-resource-sb a").removeClass("rab-resource-sb-active");
-            $("#rab-nav-" + elFromPoint.find('h3>a').data('id')).addClass("rab-resource-sb-active");
+            navItem = $("#rab-nav-" + elFromPoint.find('h3>a').data('id'));
+            if (navItem.parent().position().top > rabSidebar.scrollTop() && !window.rabProps.loaded) {
+              setTimeout(function() {
+                var moveBy;
+                moveBy = navItem.position().top;
+                rabSidebar.scrollTop(moveBy);
+                return window.rabProps.loaded = true;
+              }, 10);
+            }
+            if (navItem.parent().position().top > (rabSidebar.height() - navItem.parent().height() * 2) && (rabSidebar.scrollTop() + rabSidebar.height()) < rabSidebarInner.height() && navItem.parent().position().top > 0 && rabSidebar.scrollTop() >= 0 && rabSidebar.height() > navItem.parent().position().top) {
+              moveDownBy = navItem.parent().position().top + rabSidebar.scrollTop() - (rabSidebar.height() - (2 * navItem.parent().height()));
+              rabSidebar.scrollTop(moveDownBy);
+            }
+            if (navItem.parent().position().top < 0 && (rabSidebar.scrollTop() + (navItem.parent().height())) < rabSidebarInner.height() && (rabSidebar.scrollTop() + rabSidebar.height()) < rabSidebarInner.height()) {
+              moveUpBy = rabSidebar.scrollTop() - navItem.parent().height();
+              rabSidebar.scrollTop(moveUpBy);
+            }
+            navItem.addClass("rab-resource-sb-active");
           }
           currPosn = top + window.rabProps.winHeight;
           if (top > window.rabProps.origSidebarOffsetTop) {
             contentBottom = this.origSidebarOffsetTop + $(".rab-content").height();
             if (currPosn > contentBottom) {
-              return $(".rab-sidebar").css({
+              return rabSidebar.css({
                 top: contentBottom - currPosn
               });
             } else {
-              $('.rab-sidebar').height(function() {
+              rabSidebar.height(function() {
                 return $(window).height();
               });
-              $(".rab-sidebar").css({
+              rabSidebar.css({
                 position: "fixed",
                 top: 0,
                 width: window.rabProps.origSidebarWidth
@@ -97,7 +117,12 @@ angular.module('rab.service', ['ngSanitize']).value('helper', {
   }
 });
 
-angular.module('rab', ['rab.service', 'rab.directives']);
+angular.module('rab', ['rab.service', 'rab.directives']).run(function() {
+  return $('body').on('submit', '.rab-endpoint', function() {
+    console.log(arguments);
+    return false;
+  });
+});
 
 ServiceSelectorController = (function() {
 
@@ -137,6 +162,7 @@ ResourceMainController = (function() {
     $scope.slugify = this.slugify;
     $scope.fullUrl = this.getFullUrl;
     $scope.slugify = helper.slugify;
+    $scope.execute = this.execute;
   }
 
   ResourceMainController.prototype.getFullUrl = function(path) {

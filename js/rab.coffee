@@ -19,16 +19,16 @@ angular.module('rab.directives',[])
           origSidebarOffsetTop: $(".rab-sidebar").offset().top
           origSidebarWidth: $(".rab-sidebar").width()
           winHeight: $(window).height()
+          loaded: false
 
       calculateBoxes()
 
-      # Scroll into view 
+      # Scroll main content into view 
       setTimeout ->
         return unless location.hash
         anchor = document.getElementById(location.hash.split('#')[1])
         anchor.scrollIntoView() if anchor
-      , 100
-
+      , 300
 
       angular.element($window).on 'resize', ->
         calculateBoxes()
@@ -37,12 +37,41 @@ angular.module('rab.directives',[])
         x = $(".rab-resources").position().left
         top = $(window).scrollTop() - 15
         elFromPoint = $(document.elementFromPoint(x, 5))
+        rabSidebar = $('.rab-sidebar')
+        rabSidebarInner = $('.rab-sidebar-inner')
 
         # Highlight selected resource in sidebar as the main content
         # is scrolled.
         if elFromPoint.hasClass("rab-resource")
           $(".rab-resource-sb a").removeClass "rab-resource-sb-active"
-          $("#rab-nav-" + elFromPoint.find('h3>a').data('id')).addClass "rab-resource-sb-active"
+          navItem = $("#rab-nav-" + elFromPoint.find('h3>a').data('id'))
+
+          # console.log navItem.parent().position().top, rabSidebar.scrollTop(), rabSidebar.height(), rabSidebarInner.height(), window.rabProps.loaded
+
+          # if navItem is initially out of view, scroll to it
+          if navItem.parent().position().top > rabSidebar.scrollTop() and !window.rabProps.loaded
+            setTimeout ->
+              moveBy = navItem.position().top
+              rabSidebar.scrollTop(moveBy)
+              window.rabProps.loaded = true
+            , 10
+
+          # keep selected item in SB in view when scrolling content down
+          if navItem.parent().position().top > (rabSidebar.height() - navItem.parent().height()*2) and 
+            (rabSidebar.scrollTop() + rabSidebar.height()) < rabSidebarInner.height() and 
+            navItem.parent().position().top > 0 and 
+            rabSidebar.scrollTop() >= 0 and rabSidebar.height() > navItem.parent().position().top
+              moveDownBy = navItem.parent().position().top + rabSidebar.scrollTop() - (rabSidebar.height() - (2*navItem.parent().height())) 
+              rabSidebar.scrollTop(moveDownBy)
+
+          # keep selected item in SB in view when scrolling the content up
+          if navItem.parent().position().top < 0 and 
+            (rabSidebar.scrollTop() + (navItem.parent().height())) < rabSidebarInner.height() and 
+            (rabSidebar.scrollTop() + rabSidebar.height()) < rabSidebarInner.height()
+              moveUpBy = rabSidebar.scrollTop() - navItem.parent().height()
+              rabSidebar.scrollTop(moveUpBy)
+
+          navItem.addClass "rab-resource-sb-active"
 
         # Fix the sidebar as the main content container is scrolled allowing
         # for easy access to resources without it scrolling off the screen.
@@ -50,12 +79,12 @@ angular.module('rab.directives',[])
         if top > window.rabProps.origSidebarOffsetTop
           contentBottom = @origSidebarOffsetTop + $(".rab-content").height()
           if currPosn > contentBottom 
-            $(".rab-sidebar").css top: contentBottom - currPosn
+            rabSidebar.css top: contentBottom - currPosn
           else
-            $('.rab-sidebar').height ->
+            rabSidebar.height ->
               $(window).height()
 
-            $(".rab-sidebar").css
+            rabSidebar.css
               position: "fixed"
               top: 0
               width: window.rabProps.origSidebarWidth
@@ -81,6 +110,10 @@ angular.module('rab.service',['ngSanitize'])
         .replace(/-$/, '')
 
 angular.module('rab',['rab.service','rab.directives'])
+  .run ->
+    $('body').on 'submit', '.rab-endpoint',->
+      console.log arguments
+      false
 
 class ServiceSelectorController
   constructor: ($scope) ->
@@ -104,7 +137,7 @@ class ResourceMainController
     $scope.slugify = @slugify
     $scope.fullUrl = @getFullUrl
     $scope.slugify = helper.slugify
-
+    $scope.execute = @execute
 
   getFullUrl: (path)->
     servicesScope = angular.element('.rab-service-selector.ng-scope').scope();

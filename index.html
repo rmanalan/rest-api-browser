@@ -5,11 +5,6 @@
     <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" type="text/css">
     <link rel="stylesheet" href="css/prettify.css">
     <link rel="stylesheet" href="css/styles.css">    
-    <script type="text/javascript" src="js/jquery.min.js"></script>
-    <script type="text/javascript" src="js/process-wadl.js"></script>
-    <script type="text/javascript" src="js/angular-1.0.1/angular-1.0.1.js"></script>
-    <script type="text/javascript" src="js/angular-1.0.1/angular-sanitize-1.0.1.min.js"></script>
-    <script type="text/javascript" src="js/rab.js"></script>
   </head>
   <body>
 
@@ -52,19 +47,21 @@
             
             <div class="content-body" ng-controller="ResourceSidebarController">
               <div class="rab-sidebar rab-col" rab-scrollfix>
-                <h3>Resources</h3>
-                <ul class="rab-resources-sb">
-                  <li class="rab-resource-sb" ng-repeat="resource in resources">
-                    <a id="rab-nav-{{slugify(resource.name)}}" href="#rab-resource-{{slugify(resource.name)}}" title="{{resource.name}}">
-                    {{resource.name}}
-                    </a>
-                  </li>
-                </ul>
+                <div class="rab-sidebar-inner">
+                  <h3>Resources</h3>
+                  <ul class="rab-resources-sb">
+                    <li class="rab-resource-sb" ng-repeat="resource in resources">
+                      <a id="rab-nav-{{slugify(resource.name)}}" href="#rab-resource-{{slugify(resource.name)}}" title="{{resource.name}}">
+                      {{resource.name}}
+                      </a>
+                    </li>
+                  </ul>
+                </div>
               </div>
               <div class="rab-content rab-col" ng-controller="ResourceMainController">
                 <ul class="rab-resources">
                   <li ng-repeat="resource in $parent.resources" id="rab-resource-{{slugify(resource.name)}}" class="rab-resource">
-                    <h3><a href="#{{resource.name}}" data-id="{{slugify(resource.name)}}">{{resource.name}}</a></h3>
+                    <h3><a href="#rab-resource-{{slugify(resource.name)}}" data-id="{{slugify(resource.name)}}">{{resource.name}}</a></h3>
                     <p ng-show="resource.description" ng-bind-html="resource.description"></p>
                     <ul class="rab-methods">
                       <li class="rab-method rab-method-{{method.method}}" ng-repeat="method in resource.methods">
@@ -109,7 +106,7 @@
                           </tbody>
                         </table>
                         <textarea name="body" ng-show="method.method=='POST' || method.method=='PUT'"></textarea>
-                        <input type="submit" class="aui-button rab-exec" value="Execute"/>
+                        <input type="submit" class="aui-button rab-exec" value="Execute" />
                         <a href="#" class="rab-clear">Clear results</a>
                         <img class="hidden rab-throbber" src="images/ajax-loader.gif" />
                         <div class="rab-output-type" ng-show="method.representations && method.representations.contentTypes.length > 0">
@@ -133,6 +130,10 @@
 
       </div>
     </div>
-
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/process-wadl.js"></script>
+    <script type="text/javascript" src="js/angular-1.0.1/angular-1.0.1.js"></script>
+    <script type="text/javascript" src="js/angular-1.0.1/angular-sanitize-1.0.1.min.js"></script>
+    <script type="text/javascript" src="js/rab.js"></script>
   </body>
 </html>
